@@ -13,23 +13,14 @@ output "cluster_security_group_id" {
   value       = aws_security_group.cluster.id
 }
 
-output "rocky9_ami_id" {
-  description = "Rocky Linux 9 base AMI selected for the builder"
-  value       = data.aws_ami.rocky9.id
+output "mgs_instance_id" {
+  value = aws_instance.mgs.id
 }
 
-output "image_builder_instance_id" {
-  description = "EC2 instance ID of the Lustre image builder"
-  value       = aws_instance.image_builder.id
+output "oss1_instance_id" {
+  value = aws_instance.oss1.id
 }
 
-output "image_builder_public_ip" {
-  description = "Public IP address of the Lustre image builder"
-  value       = aws_instance.image_builder.public_ip
+output "client1_instance_id" {
+  value = aws_instance.client1.id
 }
-
-output "image_builder_private_ip" {
-  description = "Private IP address of the Lustre image builder"
-  value       = aws_instance.image_builder.private_ip
-}
-

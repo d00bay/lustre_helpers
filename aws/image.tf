@@ -7,30 +7,6 @@ resource "aws_key_pair" "lustre_lab" {
   }
 }
 
-data "aws_ami" "rocky9" {
-  most_recent = true
-  owners      = ["792107900819"]
-
-  filter {
-    name   = "name"
-    values = ["Rocky-9-EC2-Base-*.x86_64"]
-  }
-
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
 
 resource "aws_iam_role" "image_builder_ssm" {
   name = "lustre-lab-image-builder-ssm"
@@ -57,34 +33,28 @@ resource "aws_iam_instance_profile" "image_builder" {
   role = aws_iam_role.image_builder_ssm.name
 }
 
-resource "aws_instance" "image_builder" {
-  ami                         = data.aws_ami.rocky9.id
-  instance_type               = var.builder_instance_type
-  subnet_id                   = aws_subnet.cluster.id
-  vpc_security_group_ids      = [aws_security_group.cluster.id]
-  key_name                    = aws_key_pair.lustre_lab.key_name
-  private_ip                  = "10.10.0.5"
-  associate_public_ip_address = true
-  iam_instance_profile        = aws_iam_instance_profile.image_builder.name
 
-  user_data = <<-EOF
-    #!/bin/bash
-    dnf install -y \
-      https://s3.ca-central-1.amazonaws.com/amazon-ssm-ca-central-1/latest/linux_amd64/amazon-ssm-agent.rpm
+data "aws_ami" "lustre" {
+  most_recent = true
+  owners      = ["self"]
 
-    systemctl enable --now amazon-ssm-agent
-  EOF
-  
-  user_data_replace_on_change = true
-
-  root_block_device {
-    volume_type           = "gp3"
-    volume_size           = var.boot_disk_size_gb
-    delete_on_termination = true
+  filter {
+    name   = "tag:Project"
+    values = ["lustre-lab"]
   }
 
-  tags = {
-    Name = "lustre-lab-image-builder"
-    Role = "image-builder"
+  filter {
+    name   = "tag:OS"
+    values = ["rocky-9"]
+  }
+
+  filter {
+    name   = "tag:Lustre"
+    values = ["2.17.0"]
+  }
+
+  filter {
+    name   = "state"
+    values = ["available"]
   }
 }
