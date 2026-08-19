@@ -20,7 +20,7 @@ variable "repo_ref" {
 source "qemu" "lustre" {
   iso_url      = "https://download.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2"
   iso_checksum = "none"
-
+  qemu_binary = "/usr/libexec/qemu-kvm"
   disk_image = true
   format     = "qcow2"
 
