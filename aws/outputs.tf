@@ -18,9 +18,9 @@ output "mgs_instance_id" {
 }
 
 output "oss1_instance_id" {
-  value = aws_instance.oss1.id
+  value = aws_instance.oss[*].id
 }
 
 output "client1_instance_id" {
-  value = aws_instance.client1.id
+  value = aws_instance.client[*].id
 }
