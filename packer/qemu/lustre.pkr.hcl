@@ -48,11 +48,9 @@ source "qemu" "lustre" {
   boot_wait = "10s"
 
   boot_command = [
-    "<up><wait>",
-    "e<wait>",
-    "<down><down><end>",
+    "<tab><wait>",
     " inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg",
-    "<leftCtrlOn>x<leftCtrlOff>"
+    "<enter>"
   ]
   net_device     = "virtio-net"
   disk_interface = "virtio"
