@@ -80,26 +80,13 @@ resource "google_compute_instance" "mds" {
     #!/bin/bash
     set -euxo pipefail
 
-    dnf -y install git || true
-
-    if [[ -d /opt/lustre-helpers ]]; then
-      cd /opt/lustre-helpers
-      git pull --ff-only
-    else
-      rm -rf /opt/lustre-helpers
-      git clone ${var.repo_url} /opt/lustre-helpers
-      cd /opt/lustre-helpers
-    fi
-    
+    cd /opt/lustre-helpers
     bash configure_lustre_role.sh \
       --role mds \
       --fsname ${var.fsname} \
       --mdt-dev /dev/disk/by-id/google-mdt0 \
       --format true
   EOF
-  depends_on = [
-    google_compute_image.lustre_image
-  ]
 }
 
 resource "google_compute_instance" "oss" {
@@ -131,17 +118,7 @@ resource "google_compute_instance" "oss" {
     #!/bin/bash
     set -euxo pipefail
 
-    dnf -y install git || true
-
-    if [[ -d /opt/lustre-helpers ]]; then
-      cd /opt/lustre-helpers
-      git pull --ff-only
-    else
-      rm -rf /opt/lustre-helpers
-      git clone ${var.repo_url} /opt/lustre-helpers
-      cd /opt/lustre-helpers
-    fi
-
+    cd /opt/lustre-helpers
 
     bash configure_lustre_role.sh \
       --role oss \
@@ -153,7 +130,6 @@ resource "google_compute_instance" "oss" {
   EOF
 
   depends_on = [
-    google_compute_image.lustre_image,
     google_compute_instance.mds
   ]
 }
@@ -183,18 +159,9 @@ resource "google_compute_instance" "client" {
     #!/bin/bash
     set -euxo pipefail
 
-    dnf -y install git || true
+    cd /opt/lustre-helpers
 
-    if [[ -d /opt/lustre-helpers ]]; then
-      cd /opt/lustre-helpers
-      git pull --ff-only
-    else
-      rm -rf /opt/lustre-helpers
-      git clone ${var.repo_url} /opt/lustre-helpers
-      cd /opt/lustre-helpers
-    fi
-    
-    sleep 90
+    sleep 120
 
     bash configure_lustre_role.sh \
       --role client \
@@ -220,7 +187,6 @@ resource "google_compute_instance" "client" {
   EOF
 
   depends_on = [
-    google_compute_image.lustre_image,
     google_compute_instance.mds,
     google_compute_instance.oss
   ]

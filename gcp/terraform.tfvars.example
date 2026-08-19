@@ -5,4 +5,4 @@ zone       = "your-zone"
 
 enable_monitoring = true
 
-repo_url = "https://github.com/ecce-machina/lustre_helpers.git"
+repo_url = "https://github.com/ecce-machina/lustre_lab.git"
