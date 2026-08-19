@@ -7,6 +7,11 @@ packer {
   }
 }
 
+variable "qemu_binary" {
+  type    = string
+  default = "qemu-system-x86_64"
+}
+
 variable "repo_url" {
   type    = string
   default = "https://github.com/ecce-machina/lustre_lab.git"
@@ -18,41 +23,40 @@ variable "repo_ref" {
 }
 
 source "qemu" "lustre" {
-  iso_url      = "https://download.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2"
+  iso_url      = "https://download.rockylinux.org/pub/rocky/9/isos/x86_64/Rocky-9-latest-x86_64-minimal.iso"
   iso_checksum = "none"
-  qemu_binary = "/usr/libexec/qemu-kvm"
-  disk_image = true
-  format     = "qcow2"
 
   output_directory = "output"
   vm_name          = "lustre-lab-rocky9.qcow2"
 
+  format    = "qcow2"
   disk_size = "40G"
 
   memory = 4096
   cpus   = 4
 
-  headless = true
+  headless     = true
+  accelerator  = "kvm"
+  qemu_binary  = var.qemu_binary
 
-  ssh_username = "rocky"
-  ssh_timeout  = "20m"
+  ssh_username = "packer"
+  ssh_password = "packer"
+  ssh_timeout  = "30m"
 
+  http_directory = "http"
+
+  boot_wait = "10s"
+
+  boot_command = [
+    "<up><wait>",
+    "e<wait>",
+    "<down><down><end>",
+    " inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg",
+    "<leftCtrlOn>x<leftCtrlOff>"
+  ]
   net_device     = "virtio-net"
   disk_interface = "virtio"
-  cd_label       = "cidata"
-
-  cd_content = {
-    "meta-data" = <<-EOF
-      instance-id: lustre-packer
-      local-hostname: lustre-packer
-    EOF
-
-    "user-data" = templatefile("${path.root}/cloud-init/user-data", {
-      ssh_key = "{{ .SSHPublicKey }}"
-    })
-  }
 }
-
 
 
 build {
