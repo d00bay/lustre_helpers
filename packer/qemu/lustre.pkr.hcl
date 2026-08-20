@@ -7,6 +7,10 @@ packer {
   }
 }
 
+variable "ssh_public_key" {
+  type = string
+}
+
 variable "qemu_binary" {
   type    = string
   default = "qemu-system-x86_64"
@@ -149,4 +153,21 @@ build {
       EOT
     ]
   }
+  provisioner "shell" {
+    execute_command = "chmod +x {{ .Path }}; sudo -E {{ .Vars }} {{ .Path }}"
+
+    environment_vars = [
+      "SSH_PUBLIC_KEY=${var.ssh_public_key}",
+    ]
+
+    inline = [
+      "set -euxo pipefail",
+      "mkdir -p /home/packer/.ssh",
+      "echo \"$SSH_PUBLIC_KEY\" > /home/packer/.ssh/authorized_keys",
+      "chown -R packer:packer /home/packer/.ssh",
+      "chmod 700 /home/packer/.ssh",
+      "chmod 600 /home/packer/.ssh/authorized_keys",
+    ]
+  }
 }
+
