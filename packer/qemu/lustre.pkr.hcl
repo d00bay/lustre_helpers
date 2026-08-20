@@ -23,7 +23,7 @@ variable "repo_ref" {
 }
 
 source "qemu" "lustre" {
-  iso_url      = "https://download.rockylinux.org/pub/rocky/9/isos/x86_64/Rocky-9.8-x86_64-dvd.iso"
+  iso_url      = "https://download.rockylinux.org/pub/rocky/9/isos/x86_64/Rocky-9-latest-x86_64-minimal.iso"
   iso_checksum = "none"
 
   output_directory = "output"
@@ -37,6 +37,10 @@ source "qemu" "lustre" {
 
   headless     = true
   accelerator  = "kvm"
+
+  qemuargs = [
+    ["-cpu", "host"]
+  ]
   qemu_binary  = var.qemu_binary
 
   ssh_username = "packer"
