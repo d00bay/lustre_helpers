@@ -7,7 +7,7 @@ packer {
   }
 }
 
-variable "ssh_public_key" {
+variable "ssh_public_key_file" {
   type = string
 }
 
@@ -153,6 +153,7 @@ build {
       EOT
     ]
   }
+  
   provisioner "shell" {
     execute_command = "chmod +x {{ .Path }}; sudo -E {{ .Vars }} {{ .Path }}"
 
@@ -162,11 +163,14 @@ build {
 
     inline = [
       "set -euxo pipefail",
-      "mkdir -p /home/packer/.ssh",
-      "echo \"$SSH_PUBLIC_KEY\" > /home/packer/.ssh/authorized_keys",
-      "chown -R packer:packer /home/packer/.ssh",
-      "chmod 700 /home/packer/.ssh",
+      "test -n \"$SSH_PUBLIC_KEY\"",
+      "install -d -m 700 -o packer -g packer /home/packer/.ssh",
+      "printf '%s\\n' \"$SSH_PUBLIC_KEY\" > /home/packer/.ssh/authorized_keys",
+      "chown packer:packer /home/packer/.ssh/authorized_keys",
       "chmod 600 /home/packer/.ssh/authorized_keys",
+      "test -s /home/packer/.ssh/authorized_keys",
+      "grep -q '^ssh-' /home/packer/.ssh/authorized_keys",
+      "touch /opt/lustre-helpers/.ssh_key_installed",
     ]
   }
 }
