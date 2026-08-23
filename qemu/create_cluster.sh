@@ -37,6 +37,8 @@ wait_for_ssh() {
 
     for _ in $(seq 1 60); do
         if ssh \
+            -i "$SSH_KEY" \
+            -o BatchMode=yes \
             -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/dev/null \
             -o ConnectTimeout=2 \
