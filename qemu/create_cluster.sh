@@ -20,6 +20,7 @@ MDT_SIZE="${MDT_SIZE:-20G}"
 OST_SIZE="${OST_SIZE:-50G}"
 
 SSH_USER="${SSH_USER:-packer}"
+SSH_KEY="${SSH_KEY:-}"
 
 die() {
     echo "ERROR: $*" >&2
