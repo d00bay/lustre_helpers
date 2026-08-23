@@ -104,10 +104,14 @@ EOF
     virsh net-autostart "$NETWORK_NAME"
 fi
 
-if ! virsh net-info "$NETWORK_NAME" | grep -q '^Active:.*yes'; then
+NETWORK_ACTIVE="$(
+    virsh net-info "$NETWORK_NAME" |
+        awk '$1 == "Active:" {print $2}'
+)"
+
+if [[ "$NETWORK_ACTIVE" != "yes" ]]; then
     virsh net-start "$NETWORK_NAME"
 fi
-
 #
 # MDS
 #
