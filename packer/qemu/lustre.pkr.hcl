@@ -154,24 +154,24 @@ build {
     ]
   }
   
+
+  provisioner "file" {
+    source      = var.ssh_public_key_file
+    destination = "/tmp/lustre_lab.pub"
+  }
+
   provisioner "shell" {
     execute_command = "chmod +x {{ .Path }}; sudo -E {{ .Vars }} {{ .Path }}"
 
-    environment_vars = [
-      "SSH_PUBLIC_KEY=${var.ssh_public_key}",
-    ]
-
     inline = [
       "set -euxo pipefail",
-      "test -n \"$SSH_PUBLIC_KEY\"",
       "install -d -m 700 -o packer -g packer /home/packer/.ssh",
-      "printf '%s\\n' \"$SSH_PUBLIC_KEY\" > /home/packer/.ssh/authorized_keys",
-      "chown packer:packer /home/packer/.ssh/authorized_keys",
-      "chmod 600 /home/packer/.ssh/authorized_keys",
+      "install -m 600 -o packer -g packer /tmp/lustre_lab.pub /home/packer/.ssh/authorized_keys",
       "test -s /home/packer/.ssh/authorized_keys",
       "grep -q '^ssh-' /home/packer/.ssh/authorized_keys",
       "touch /opt/lustre-helpers/.ssh_key_installed",
     ]
   }
-}
+}   
+ 
 
